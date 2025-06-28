@@ -37,6 +37,20 @@ def subtract(a: int, b: int) -> int:
     logger.info(f">>> Tool: 'subtract' called with numbers '{a}' and '{b}'")
     return a - b
 
+@mcp.tool()
+def multiply(a: int, b: int) -> int:
+    """Use this to multiply two numbers.
+    
+    Args:
+        a: The first number.
+        b: The second number.
+    
+    Returns:
+        The product of the two numbers.
+    """
+    logger.info(f">>> Tool: 'multiply' called with numbers '{a}' and '{b}'")
+    return a * b
+
 if __name__ == "__main__":
     logger.info(f" MCP server started on port {os.getenv('PORT', 8080)}")
     # Could also use 'sse' transport, host="0.0.0.0" required for Cloud Run.
