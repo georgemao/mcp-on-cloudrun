@@ -1,5 +1,7 @@
 # Deploy a MCP Server on Cloud Run
 
+See [Medium post](https://medium.com/google-cloud/power-your-mcp-servers-with-google-cloud-run-978df61615f4) for full walk through.
+
 This project is a simple demonstration of how to create a MCP server using the `fastmcp` library and deploy it as a containerized service on Google Cloud Run.
 
 The server exposes two basic tools:
