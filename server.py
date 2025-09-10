@@ -37,20 +37,6 @@ def subtract(a: int, b: int) -> int:
     logger.info(f">>> Tool: 'subtract' called with numbers '{a}' and '{b}'")
     return a - b
 
-@mcp.tool()
-def multiply(a: int, b: int) -> int:
-    """Use this to multiply two numbers.
-    
-    Args:
-        a: The first number.
-        b: The second number.
-    
-    Returns:
-        The product of the two numbers.
-    """
-    logger.info(f">>> Tool: 'multiply' called with numbers '{a}' and '{b}'")
-    return a * b
-
 # TODO: Implement a divide tool
 
 if __name__ == "__main__":
