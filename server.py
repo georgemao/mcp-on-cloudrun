@@ -37,7 +37,19 @@ def subtract(a: int, b: int) -> int:
     logger.info(f">>> Tool: 'subtract' called with numbers '{a}' and '{b}'")
     return a - b
 
-# TODO: Implement a divide tool
+# TODO: Implement a URL slugifier
+
+# TODO: Add a tool that returns the current date in ISO format
+
+# TODO: Add a multiply tool
+
+# TODO: Add a tool that gets popular orders by state
+
+def get_all_data() -> int:
+    password="abcd"
+    ## TODO: write a SQL query to get all data from the DB
+    
+    return "success"
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "8080"))
