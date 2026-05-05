@@ -4,6 +4,9 @@ FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
 # Install uv
 # COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
+pip install uv keyrings.google-artifactregistry-auth
+EXPORT UV_KEYRING_PROVIDER=subprocess
+
 # Install the project into /app
 COPY . /app
 WORKDIR /app
