@@ -34,7 +34,7 @@ images:
 
 substitutions:
   _REGION: us-central1
-  _REPOSITORY: mcp-repo
+  _REPOSITORY: gmao-repo
   _IMAGE_NAME: mcp-on-cloudrun
   _SERVICE_NAME: mcp-on-cloudrun
 
