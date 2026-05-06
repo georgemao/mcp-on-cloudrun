@@ -45,6 +45,7 @@ def subtract(a: int, b: int) -> int:
 
 # TODO: Add a tool that gets popular orders by state
 
+@mcp.tool()
 def get_all_data() -> int:
     password="abcd"
     ## TODO: write a SQL query to get all data from the DB
