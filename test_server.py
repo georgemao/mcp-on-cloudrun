@@ -21,5 +21,10 @@ async def test_server():
         result = await client.call_tool("subtract", {"a": 10, "b": 3})
         print(f"<<< Result: {result[0].text}")
 
+        # Call multiply tool
+        print(">>>  Calling multiply tool for 6 * 7")
+        result = await client.call_tool("multiply", {"a": 6, "b": 7})
+        print(f"<<< Result: {result[0].text}")
+
 if __name__ == "__main__":
     asyncio.run(test_server())
