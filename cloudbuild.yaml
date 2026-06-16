@@ -29,28 +29,28 @@ steps:
       
         IMAGE="${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}"
 
-        echo ">>> Scanning ${_IMAGE}"
-        gcloud artifacts docker images scan "${_IMAGE}"
+        echo ">>> Scanning $IMAGE"
+        gcloud artifacts docker images scan "$IMAGE"
 
         # Retrieve the scan findings in JSON format (default)
         # The command automatically waits for the scan to complete.
         SCAN_DATA=$(
-            gcloud artifacts docker images describe "${_IMAGE}" --format="json(scanConfig.policyEvaluation)"
+            gcloud artifacts docker images describe "$IMAGE" --format="json(scanConfig.policyEvaluation)"
         )
         CRITICAL=$(echo "$SCAN_DATA" | jq -r .scanConfig.policyEvaluation.critical)
         HIGH=$(echo "$SCAN_DATA" | jq -r .scanConfig.policyEvaluation.high)
 
-        echo ">>> Scan Results: High: $_HIGH, Critical: $_CRITICAL"
+        echo ">>> Scan Results: High: $HIGH, Critical: $CRITICAL"
 
         # 2. Define the Fail-Safe Thresholds (e.g., 5 High, 2 Critical)
-        _FAIL_HIGH=5
-        _FAIL_CRITICAL=2
+        FAIL_HIGH=5
+        FAIL_CRITICAL=2
 
         # 3. Check if the scan is clear
-        if [ "$_CRITICAL" -gt "$_FAIL_CRITICAL" ]; then
+        if [ "$CRITICAL" -gt "$FAIL_CRITICAL" ]; then
             echo "❌ BUILD WARNING: Critical vulnerabilities exceed the limit."
             #exit 1
-        elif [ "$_HIGH" -gt "$_FAIL_HIGH" ]; then
+        elif [ "$HIGH" -gt "$FAIL_HIGH" ]; then
             echo "❌ BUILD WARNING: High vulnerabilities exceed the limit."
             #exit 1
         fi
