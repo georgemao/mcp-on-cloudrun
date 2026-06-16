@@ -25,34 +25,31 @@ steps:
     args:
       - '-c'
       - |
-        echo ">>> START: Vulnerability Scan"  # Add a clear marker
-      
-        IMAGE="${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}"
-
-        echo ">>> Scanning $IMAGE"
-        gcloud artifacts docker images scan "$IMAGE"
-
-        # Retrieve the scan findings in JSON format (default)
-        # The command automatically waits for the scan to complete.
-        SCAN_DATA=$(
-            gcloud artifacts docker images describe "$IMAGE" --format="json(scanConfig.policyEvaluation)"
-        )
-        CRITICAL=$(echo "$SCAN_DATA" | jq -r .scanConfig.policyEvaluation.critical)
-        HIGH=$(echo "$SCAN_DATA" | jq -r .scanConfig.policyEvaluation.high)
-
-        echo ">>> Scan Results: High: $HIGH, Critical: $CRITICAL"
-
-        # 2. Define the Fail-Safe Thresholds (e.g., 5 High, 2 Critical)
-        FAIL_HIGH=5
-        FAIL_CRITICAL=2
-
-        # 3. Check if the scan is clear
-        if [ "$CRITICAL" -gt "$FAIL_CRITICAL" ]; then
-            echo "❌ BUILD WARNING: Critical vulnerabilities exceed the limit."
-            #exit 1
-        elif [ "$HIGH" -gt "$FAIL_HIGH" ]; then
-            echo "❌ BUILD WARNING: High vulnerabilities exceed the limit."
-            #exit 1
+        set -e
+        image='${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}'
+        echo "Scanning image: $image"
+        
+        # Start the scan and capture the SCAN name (not the operation name)
+        # We use --remote because the image has already been pushed to Artifact Registry
+        scan_name=$(gcloud artifacts docker images scan "$image" \
+          --format='value(response.scan)' \
+          --remote)
+        
+        echo "Scan completed. Scan ID: $scan_name"
+        echo "Checking for findings matching threshold: $_SEVERITY_THRESHOLD"
+        
+        # Check for vulnerabilities matching the threshold regex (e.g. CRITICAL|HIGH)
+        vulnerabilities=$(gcloud artifacts docker images list-vulnerabilities "$scan_name" \
+          --format='value(vulnerability.effectiveSeverity)' | grep -E "$_SEVERITY_THRESHOLD" | wc -l || true)
+        
+        if [ "$vulnerabilities" -gt 0 ]; then
+          echo "WARNING: Found $vulnerabilities findings matching '$_SEVERITY_THRESHOLD'."
+          echo "Listing findings:"
+          # List all and use grep to show only matching severities to avoid --filter issues
+          gcloud artifacts docker images list-vulnerabilities "$scan_name" \
+            --format='table(vulnerability.effectiveSeverity, vulnerability.shortDescription)' | grep -E "Severity|$_SEVERITY_THRESHOLD"
+        else
+          echo "SUCCESS: No findings matching '$_SEVERITY_THRESHOLD' found. Proceeding."
         fi
 
         echo ">>> Scan Completed. Continuing build."
@@ -80,6 +77,7 @@ substitutions:
   _REPOSITORY: gmao-repo
   _IMAGE_NAME: mcp-on-cloudrun
   _SERVICE_NAME: mcp-on-cloudrun
+  _SEVERITY_THRESHOLD: 'CRITICAL|HIGH'
 
 options:
   logging: CLOUD_LOGGING_ONLY
