@@ -43,10 +43,10 @@ steps:
         _FAIL_CRITICAL=2
 
         # 3. Check if the scan is clear
-        if [ "$_CRITICAL" -gt "$FAIL_CRITICAL" ]; then
+        if [ "$_CRITICAL" -gt "$_FAIL_CRITICAL" ]; then
             echo "❌ BUILD WARNING: Critical vulnerabilities exceed the limit."
             #exit 1
-        elif [ "$HIGH" -gt "$FAIL_HIGH" ]; then
+        elif [ "$_HIGH" -gt "$_FAIL_HIGH" ]; then
             echo "❌ BUILD WARNING: High vulnerabilities exceed the limit."
             #exit 1
         fi
