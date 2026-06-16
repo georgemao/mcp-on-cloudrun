@@ -26,12 +26,12 @@ steps:
         _IMAGE="${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}"
 
         echo ">>> Scanning ${_IMAGE}"
-        gcloud artifacts docker images scan "${_IMAGE}" --region="${_REGION}"
+        gcloud artifacts docker images scan "${_IMAGE}"
 
         # Retrieve the scan findings in JSON format (default)
         # The command automatically waits for the scan to complete.
         _SCAN_DATA=$(
-            gcloud artifacts docker images describe "${_IMAGE}" --region="${_REGION}" --format="json(scanConfig.policyEvaluation)"
+            gcloud artifacts docker images describe "${_IMAGE}" --format="json(scanConfig.policyEvaluation)"
         )
         _CRITICAL=$(echo "$_SCAN_DATA" | jq -r .scanConfig.policyEvaluation.critical)
         _HIGH=$(echo "$_SCAN_DATA" | jq -r .scanConfig.policyEvaluation.high)
