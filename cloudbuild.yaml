@@ -23,15 +23,15 @@ steps:
       - |
         echo ">>> START: Vulnerability Scan"  # Add a clear marker
 
-        IMAGE="${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}"
+        _IMAGE="${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}"
 
-        echo ">>> Scanning ${IMAGE}"
-        gcloud artifacts docker images scan "$IMAGE" --region="${_REGION}"
+        echo ">>> Scanning ${_IMAGE}"
+        gcloud artifacts docker images scan "${_IMAGE}" --region="${_REGION}"
 
         # Retrieve the scan findings in JSON format (default)
         # The command automatically waits for the scan to complete.
         SCAN_DATA=$(
-            gcloud artifacts docker images describe "$IMAGE" --region="${_REGION}" --format="json(scanConfig.policyEvaluation)"
+            gcloud artifacts docker images describe "${_IMAGE}" --region="${_REGION}" --format="json(scanConfig.policyEvaluation)"
         )
         CRITICAL=$(echo "$SCAN_DATA" | jq -r .scanConfig.policyEvaluation.critical)
         HIGH=$(echo "$SCAN_DATA" | jq -r .scanConfig.policyEvaluation.high)
