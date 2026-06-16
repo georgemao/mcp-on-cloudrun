@@ -29,7 +29,7 @@ steps:
         image='${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}'
         echo "Scanning image: $image"
         
-        # Start the scan and capture the SCAN name (not the operation name)
+        # Start the scan and capture the SCAN id
         # We use --remote because the image has already been pushed to Artifact Registry
         scan_name=$(gcloud artifacts docker images scan "$image" \
           --format='value(response.scan)' \
