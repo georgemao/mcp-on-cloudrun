@@ -54,20 +54,33 @@ steps:
 
         echo ">>> Scan Completed. Continuing build."
 
-  # Deploy container image to Cloud Run
+  # 3. Create a Release in Cloud Deploy (Hands off to CD)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
-      - 'run'
       - 'deploy'
-      - '${_SERVICE_NAME}'
-      - '--image'
-      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}'
-      - '--region'
-      - '${_REGION}'
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'
+      - 'releases'
+      - 'create'
+      - 'release-$SHORT_SHA'
+      - '--delivery-pipeline=mcp-on-cloudrun-pipeline'
+      - '--region=${_REGION}'
+      - '--images=mcp-on-cloudrun=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}'
+  
+  
+  # Deploy container image to Cloud Run
+  #- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  #  entrypoint: gcloud
+  #  args:
+  #    - 'run'
+  #    - 'deploy'
+  #    - '${_SERVICE_NAME}'
+  #    - '--image'
+  #    - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}'
+  #    - '--region'
+  #    - '${_REGION}'
+  #    - '--platform'
+  #    - 'managed'
+  #    - '--allow-unauthenticated'
 
 images:
   - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}'

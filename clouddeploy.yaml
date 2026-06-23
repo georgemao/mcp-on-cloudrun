@@ -1,0 +1,36 @@
+apiVersion: deploy.cloud.google.com/v1
+kind: DeliveryPipeline
+metadata:
+  name: mcp-on-cloudrun-pipeline
+serialPipeline:
+  stages:
+  - targetId: dev-env
+  - targetId: prod-env
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: dev-env
+executionConfigs:
+- usages:
+  - RENDER
+  - DEPLOY
+  #serviceAccount: cd-pipeline-sa@cicd-devops-demos.iam.gserviceaccount.com
+run:
+  location: projects/gmao-test-project/locations/us-central1
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: prod-env
+requireApproval: true
+executionConfigs:
+- usages:
+  - RENDER
+  - DEPLOY
+  #serviceAccount: cd-pipeline-sa@cicd-devops-demos.iam.gserviceaccount.com
+run:
+  location: projects/gmao-test-project/locations/us-east5
+
+
+# Run: gcloud deploy apply --file=clouddeploy.yaml --region=us-central1
