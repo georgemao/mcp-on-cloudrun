@@ -5,6 +5,14 @@ metadata:
 serialPipeline:
   stages:
   - targetId: dev-env
+    strategy:
+      canary:
+        runtimeConfig:
+          cloudRun:
+            automaticTrafficControl: true
+        canaryDeployment:
+          percentages: [25]
+          verify: false
   - targetId: prod-env
 --- # This defines the dev environment
 apiVersion: deploy.cloud.google.com/v1
@@ -47,5 +55,22 @@ rules:
     id: "promote-release"
     wait: 1m
     destinationTargetId: "@next"
+--- # This automates the advancement of the canary in dev
+apiVersion: deploy.cloud.google.com/v1
+kind: Automation
+metadata:
+  name: mcp-on-cloudrun-pipeline/advance
+description: advances a rollout
+suspended: false
+serviceAccount: cd-pipeline-sa@gmao-test-project.iam.gserviceaccount.com
+selector:
+  targets:
+  - id: dev-env
+rules:
+- advanceRolloutRule:
+    id: "advance-rollout"
+    sourcePhases: ["canary-25"]
+    wait: 1m
+
 
 # Run: gcloud deploy apply --file=clouddeploy.yaml --region=us-central1
