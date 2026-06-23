@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: mcp-on-cloudrun
   annotations:
-    run.googleapis.com/binary-authorization: default
+    run.googleapis.com/binary-authorization: default #TODO: Add config
 spec:
   template:
     spec:
