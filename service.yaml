@@ -8,4 +8,4 @@ spec:
   template:
     spec:
       containers:
-      - image: us-central1-docker.pkg.dev/cicd-devops-demos/gmao-repo/mcp-on-cloudrun:latest
+      - image: us-central1-docker.pkg.dev/gmao-test-project/gmao-repo/mcp-on-cloudrun:latest
