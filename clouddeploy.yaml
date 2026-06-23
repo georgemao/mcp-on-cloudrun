@@ -15,7 +15,7 @@ executionConfigs:
 - usages:
   - RENDER
   - DEPLOY
-  #serviceAccount: cd-pipeline-sa@cicd-devops-demos.iam.gserviceaccount.com
+  serviceAccount: cd-pipeline-sa@gmao-test-project.iam.gserviceaccount.com
 run:
   location: projects/gmao-test-project/locations/us-central1
 ---
@@ -28,7 +28,7 @@ executionConfigs:
 - usages:
   - RENDER
   - DEPLOY
-  #serviceAccount: cd-pipeline-sa@cicd-devops-demos.iam.gserviceaccount.com
+  serviceAccount: cd-pipeline-sa@gmao-test-project.iam.gserviceaccount.com
 run:
   location: projects/gmao-test-project/locations/us-east5
 
