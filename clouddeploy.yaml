@@ -31,6 +31,21 @@ executionConfigs:
   serviceAccount: cd-pipeline-sa@gmao-test-project.iam.gserviceaccount.com
 run:
   location: projects/gmao-test-project/locations/us-east5
-
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Automation
+metadata:
+  name: mcp-on-cloudrun-pipeline/promote
+description: Promotes a release to the next target
+suspended: false
+serviceAccount: cd-pipeline-sa@gmao-test-project.iam.gserviceaccount.com
+selector:
+  targets:
+  - id: prod-env
+rules:
+- promoteReleaseRule:
+    id: "promote-release"
+    wait: 1m
+    destinationTargetId: "@next"
 
 # Run: gcloud deploy apply --file=clouddeploy.yaml --region=us-central1
