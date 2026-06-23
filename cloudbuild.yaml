@@ -1,5 +1,5 @@
 steps:
-  # Build the container image
+  # 1. Build the container image
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Build'
     args: [
@@ -8,7 +8,7 @@ steps:
       '.'
     ]
 
-  # Push the container image to Artifact Registry
+  # 2. Push the container image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Push'
     waitFor: ['Build']
@@ -17,7 +17,7 @@ steps:
       '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}'
     ]
 
-  # Scan for Vulnerabilities in the image
+  # 3. Scan for Vulnerabilities in the image
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: VulnerabilityScan
     waitFor: ['Push']
@@ -54,7 +54,7 @@ steps:
 
         echo ">>> Scan Completed. Continuing build."
 
-  # 3. Create a Release in Cloud Deploy (Hands off to CD)
+  # 4. Create a Release in Cloud Deploy (Hands off to CD)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: Deploy
     waitFor: ['VulnerabilityScan']
