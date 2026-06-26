@@ -42,14 +42,30 @@ def subtract(a: int, b: int) -> int:
 # TODO: Add a tool that returns the current date in ISO format
 
 # TODO: Add a multiply tool
+@mcp.tool()
+def multiply(a: int, b: int) -> int:
+    """Use this to multiply two numbers.
+    
+    Args:
+        a: The first number.
+        b: The second number.
+    
+    Returns:
+        The product of the two numbers.
+    """
+    logger.info(f">>> Tool: 'multiply' called with numbers '{a}' and '{b}'")
+    return a * b
 
 # TODO: Add a tool that gets popular orders by state
 
 @mcp.tool()
-def get_all_data() -> int:
-    password="abcd"
-    ## TODO: write a SQL query to get all data from the DB
+def get_all_data() -> str:
+    """Retrieve all data from the database.
     
+    Returns:
+        A status message.
+    """
+    ## TODO: write a SQL query to get all data from the DB securely
     return "success"
 
 if __name__ == "__main__":
