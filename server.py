@@ -41,7 +41,6 @@ def subtract(a: int, b: int) -> int:
 
 # TODO: Add a tool that returns the current date in ISO format
 
-# TODO: Add a multiply tool
 @mcp.tool()
 def multiply(a: int, b: int) -> int:
     """Use this to multiply two numbers.
