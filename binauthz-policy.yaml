@@ -1,0 +1,5 @@
+defaultAdmissionRule: 
+  evaluationMode: ALWAYS_DENY 
+  enforcementMode: ENFORCED_BLOCK_AND_AUDIT_LOG 
+admissionWhitelistPatterns: 
+- namePattern: "us-central1-docker.pkg.dev/gmao-test-project/gmao-repo/*" 

@@ -1,3 +1,4 @@
 .gemini
 .venv
 .DS_Store
+*pycache*
