@@ -1,8 +1,15 @@
+"""Test client for MCP Server on Cloud Run.
+
+This module contains test routines to programmatically verify and exercise
+the registered tools on the running MCP server.
+"""
+
 import asyncio
 
 from fastmcp import Client
 
 async def test_server():
+    """Client test routine that connects to the local FastMCP server and calls tools."""
     # Test the MCP server using streamable-http transport.
     # Use "/sse" endpoint if using sse transport.
     async with Client("http://localhost:8080/mcp") as client:
