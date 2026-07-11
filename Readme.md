@@ -4,9 +4,13 @@ See [Medium post](https://medium.com/google-cloud/power-your-mcp-servers-with-go
 
 This project is a simple demonstration of how to create a MCP server using the `fastmcp` library and deploy it as a containerized service on Google Cloud Run.
 
-The server exposes two basic tools:
+The server exposes several tools:
 - `add`: Adds two numbers.
 - `subtract`: Subtracts two numbers.
+- `multiply`: Multiplies two numbers.
+- `slugify`: Converts a string into a URL-friendly slug.
+- `get_current_date_iso`: Gets the current date and time in ISO 8601 format.
+- `get_popular_orders_by_state`: Gets a summary of popular orders for a given US state.
 
 ## Project Structure
 
