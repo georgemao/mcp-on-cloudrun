@@ -3,6 +3,7 @@ import asyncio
 from fastmcp import Client
 
 async def test_server():
+    """Test the MCP server by listing and calling registered tools via Client."""
     # Test the MCP server using streamable-http transport.
     # Use "/sse" endpoint if using sse transport.
     async with Client("http://localhost:8080/mcp") as client:
