@@ -1,5 +1,5 @@
 steps:
-  - id: install-codemender
+  - id: InstallCodeMender
     name: gcr.io/google.com/cloudsdktool/google-cloud-cli:slim
     script: |
       #!/usr/bin/env bash
@@ -13,51 +13,51 @@ steps:
       
       chmod +x /workspace/.codemender-cli/cm
 
-  - id: fetch-history
-    name: gcr.io/google.com/cloudsdktool/google-cloud-cli:slim
-    script: |
-      #!/usr/bin/env bash
-      set -euo pipefail
-      : "${_BASE_BRANCH:?Run this build from a pull request trigger.}"
-      # Triggers check out only the pull request's commit. CodeMender needs the
-      # history back to where the pull request branched from the base branch.
-      # Fetch from origin, or from GitHub if origin isn't configured.
-      refspec="+refs/heads/$_BASE_BRANCH:refs/remotes/origin/$_BASE_BRANCH"
-      git fetch --quiet --unshallow origin "$refspec" ||
-        git fetch --quiet --unshallow \
-          "https://github.com/$REPO_FULL_NAME.git" "$refspec"
-      merge_base=$(git merge-base HEAD "origin/$_BASE_BRANCH")
-      echo "Merge base with $_BASE_BRANCH: $merge_base"
 
-  - id: scan
-    name: gcr.io/google.com/cloudsdktool/google-cloud-cli:slim
+  - id: 'CodeMenderScan'
+    name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli:slim'
+    waitFor: ['InstallCodeMender']
     script: |
       #!/usr/bin/env bash
       set -uo pipefail
       export PATH="/workspace/.codemender-cli:$PATH"
-      # The project that has access to CodeMender.
       export GOOGLE_CLOUD_PROJECT="$PROJECT_ID"
+
       cm init || exit 1
       status=0
-      cm find . \
-        --diff="origin/$_BASE_BRANCH" \
-        --diff-workers=16 \
-        --fail-on=CRITICAL,HIGH \
-        --format=sarif \
-        --output=codemender.sarif \
-        --sandbox=false \
-        --yes \
-        --bypass-warning || status=$?
 
-      # cm find writes the SARIF report when the scan completes.
+      echo "Starting CodeMender scan on source directory..."
+      # If _BASE_BRANCH is set (e.g. in PR triggers), run diff scan; otherwise full repo scan
+      if [ -n "${_BASE_BRANCH:-}" ]; then
+        cm find . \
+          --diff="origin/${_BASE_BRANCH}" \
+          --diff-workers=16 \
+          --fail-on="${_CODEMENDER_FAIL_ON}" \
+          --format=sarif \
+          --output=codemender.sarif \
+          --sandbox=false \
+          --yes \
+          --bypass-warning || status=$?
+      else
+        cm find . \
+          --fail-on="${_CODEMENDER_FAIL_ON}" \
+          --format=sarif \
+          --output=codemender.sarif \
+          --sandbox=false \
+          --yes \
+          --bypass-warning || status=$?
+      fi
+
       if [ -f codemender.sarif ]; then
-        # cm find doesn't print finding details, so print them here.
-        cm report --status=OPEN --format=md
+        echo "=== CodeMender Findings Summary ==="
+        cm report --status=OPEN --format=table
+
+        # Upload report to GCS if a bucket is configured
         if [ -n "${_REPORT_BUCKET:-}" ]; then
-          gcloud storage cp codemender.sarif \
-            "gs://$_REPORT_BUCKET/codemender/$BUILD_ID.sarif" || status=1
+          gcloud storage cp codemender.sarif "gs://${_REPORT_BUCKET}/codemender/${BUILD_ID}.sarif" || true
         fi
       fi
+
       exit "$status"
 
   # 1. Build the container image
@@ -154,6 +154,8 @@ substitutions:
   _IMAGE_NAME: mcp-on-cloudrun
   _SERVICE_NAME: mcp-on-cloudrun
   _SEVERITY_THRESHOLD: 'CRITICAL|HIGH'
+  _CODEMENDER_FAIL_ON: 'CRITICAL,HIGH'
+  _BASE_BRANCH: ''       # Set to 'main' for PR diff scans
   _CM_DOWNLOAD_URL: https://artifactregistry.googleapis.com/download/v1/projects/cmoc-prod/locations/us/repositories/codemender-cli-production/files/cm%3Astable%3Acm-linux-amd64.zip:download?alt=media
   _REPORT_BUCKET: 'gmao-test-bucket'  # Optional: a bucket to save the SARIF report in.
 
