@@ -5,7 +5,11 @@ steps:
       #!/usr/bin/env bash
       set -euo pipefail
       curl -fsSL -o /tmp/cm.zip "$_CM_DOWNLOAD_URL"
-      unzip -q /tmp/cm.zip -d /workspace/.codemender-cli
+      
+      # Symlink the bundled python so 'python3' works natively
+      ln -s /usr/lib/google-cloud-sdk/platform/bundledpythonunix/bin/python3 /usr/local/bin/python3
+
+      python3 -m zipfile -e /tmp/cm.zip /workspace/.codemender-cli
       
       chmod +x /workspace/.codemender-cli/cm
 
