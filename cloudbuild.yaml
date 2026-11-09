@@ -5,7 +5,8 @@ steps:
       #!/usr/bin/env bash
       set -euo pipefail
       curl -fsSL -o /tmp/cm.zip "$_CM_DOWNLOAD_URL"
-      python3 -m zipfile -e /tmp/cm.zip /workspace/.codemender-cli
+      unzip -q /tmp/cm.zip -d /workspace/.codemender-cli
+      
       chmod +x /workspace/.codemender-cli/cm
 
   - id: fetch-history
