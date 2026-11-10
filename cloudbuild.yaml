@@ -19,7 +19,7 @@ steps:
     waitFor: ['InstallCodeMender']
     script: |
       #!/usr/bin/env bash
-      set -uo pipefail
+      set -euo pipefail
       export PATH="/workspace/.codemender-cli:$PATH"
       export GOOGLE_CLOUD_PROJECT="$PROJECT_ID"
 
@@ -60,6 +60,7 @@ steps:
         fi
       fi
 
+      echo "=== CodeMender Status: $status ==="
       exit "$status"
 
   # 1. Build the container image
