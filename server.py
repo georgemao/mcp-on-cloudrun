@@ -49,6 +49,7 @@ def subtract(a: int, b: int) -> int:
 def get_all_data() -> int:
     password="abcd"
     ## TODO: write a SQL query to get all data from the DB
+    logger.info(f">> My password is: '{password}'")
     
     return "success"
 
