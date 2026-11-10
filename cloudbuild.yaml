@@ -61,11 +61,53 @@ steps:
       fi
 
       echo "=== CodeMender Status: $status ==="
-      exit "$status"
+      echo "$status" > /workspace/.cm_status
+
+  # Upload SARIF report to GitHub Code Scanning
+  - id: 'UploadSarif'
+    name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli:slim'
+    waitFor: ['CodeMenderScan']
+    secretEnv: ['GITHUB_TOKEN']
+    script: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+
+      if [ -f codemender.sarif ]; then
+        repo="${REPO_FULL_NAME:-${_GITHUB_REPO}}"
+        if [ -n "${_PR_NUMBER:-}" ]; then
+          ref="refs/pull/${_PR_NUMBER}/head"
+        else
+          ref="refs/heads/${BRANCH_NAME:-main}"
+        fi
+
+        echo "Uploading codemender.sarif to GitHub (${repo} @ ${ref}, commit ${COMMIT_SHA})..."
+        sarif_b64=$(gzip -c codemender.sarif | base64 -w0)
+
+        printf '{"commit_sha":"%s","ref":"%s","sarif":"%s"}' \
+          "$COMMIT_SHA" "$ref" "$sarif_b64" > /tmp/sarif_payload.json
+
+        curl -fsSL -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer $GITHUB_TOKEN" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          "https://api.github.com/repos/${repo}/code-scanning/sarifs" \
+          -d @/tmp/sarif_payload.json
+        echo ""
+        echo "SARIF upload complete."
+      else
+        echo "No codemender.sarif file found; skipping GitHub upload."
+      fi
+
+      cm_status=$(cat /workspace/.cm_status 2>/dev/null || echo 0)
+      if [ "$cm_status" -ne 0 ]; then
+        echo "Failing build due to CodeMender scan exit status: $cm_status"
+        exit "$cm_status"
+      fi
 
   # 1. Build the container image
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Build'
+    waitFor: ['UploadSarif']
     args: [
       'build',
       '-t', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}',
@@ -165,6 +207,13 @@ substitutions:
   _BASE_BRANCH: ''       # Set to 'main' for PR diff scans
   _CM_DOWNLOAD_URL: https://artifactregistry.googleapis.com/download/v1/projects/cmoc-prod/locations/us/repositories/codemender-cli-production/files/cm%3Astable%3Acm-linux-amd64.zip:download?alt=media
   _REPORT_BUCKET: 'gmao-test-bucket'  # Optional: a bucket to save the SARIF report in.
+  _GITHUB_REPO: 'georgemao/mcp-on-cloudrun'
+  _GITHUB_TOKEN_SECRET: 'github-token'
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/${_GITHUB_TOKEN_SECRET}/versions/latest
+      env: 'GITHUB_TOKEN'
 
 options:
   logging: CLOUD_LOGGING_ONLY
