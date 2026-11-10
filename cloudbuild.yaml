@@ -29,6 +29,7 @@ steps:
       echo "Starting CodeMender scan on source directory..."
       # If _BASE_BRANCH is set (e.g. in PR triggers), run diff scan; otherwise full repo scan
       if [ -n "${_BASE_BRANCH:-}" ]; then
+        echo "=== Diff scan ==="
         cm find . \
           --diff="origin/${_BASE_BRANCH}" \
           --diff-workers=16 \
@@ -39,6 +40,7 @@ steps:
           --yes \
           --bypass-warning || status=$?
       else
+        echo "=== Running full repo scan ==="
         cm find . \
           --fail-on="${_CODEMENDER_FAIL_ON}" \
           --format=sarif \
@@ -111,7 +113,7 @@ steps:
             --format='table(vulnerability.effectiveSeverity, vulnerability.shortDescription)' | grep -E "Severity|$_SEVERITY_THRESHOLD"
           
           # Optionally exit and block build
-          # exit 1 
+          # exit 1
 
         else
           echo "SUCCESS: No findings matching '$_SEVERITY_THRESHOLD' found. Proceeding."
@@ -159,7 +161,7 @@ substitutions:
   _SERVICE_NAME: mcp-on-cloudrun
   _SEVERITY_THRESHOLD: 'CRITICAL|HIGH'  # For Artifact Registry Image scanning
   _CODEMENDER_FAIL_ON: 'CRITICAL' #'CRITICAL,HIGH'  # For CodeMender scanning
-  _BASE_BRANCH: 'main'       # Set to 'main' for PR diff scans
+  _BASE_BRANCH: ''       # Set to 'main' for PR diff scans
   _CM_DOWNLOAD_URL: https://artifactregistry.googleapis.com/download/v1/projects/cmoc-prod/locations/us/repositories/codemender-cli-production/files/cm%3Astable%3Acm-linux-amd64.zip:download?alt=media
   _REPORT_BUCKET: 'gmao-test-bucket'  # Optional: a bucket to save the SARIF report in.
 
