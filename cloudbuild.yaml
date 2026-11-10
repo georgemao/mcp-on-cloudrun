@@ -160,7 +160,7 @@ substitutions:
   _IMAGE_NAME: mcp-on-cloudrun
   _SERVICE_NAME: mcp-on-cloudrun
   _SEVERITY_THRESHOLD: 'CRITICAL|HIGH'  # For Artifact Registry Image scanning
-  _CODEMENDER_FAIL_ON: 'CRITICAL' #'CRITICAL,HIGH'  # For CodeMender scanning
+  _CODEMENDER_FAIL_ON: 'CRITICAL,HIGH' #'CRITICAL,HIGH'  # For CodeMender scanning
   _BASE_BRANCH: ''       # Set to 'main' for PR diff scans
   _CM_DOWNLOAD_URL: https://artifactregistry.googleapis.com/download/v1/projects/cmoc-prod/locations/us/repositories/codemender-cli-production/files/cm%3Astable%3Acm-linux-amd64.zip:download?alt=media
   _REPORT_BUCKET: 'gmao-test-bucket'  # Optional: a bucket to save the SARIF report in.
