@@ -50,7 +50,7 @@ def get_all_data() -> int:
     password="AKIAIOSFODNN7EXAMPLE"
     ## TODO: write a SQL query to get all data from the DB
     logger.info(f">> My password is: '{password}'")
-    
+    ## Triger a build
     return "success"
 
 if __name__ == "__main__":
