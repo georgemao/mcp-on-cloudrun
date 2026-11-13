@@ -47,7 +47,7 @@ steps:
           --output=codemender.sarif \
           --sandbox=false \
           --yes \
-          --model gemini-3.8-flash-cyber
+          --model gemini-3.8-flash-cyber \
           --bypass-warning || status=$?
       fi
 
